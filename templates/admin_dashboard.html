@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* ================= Body & Fonts ================= */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #e0f7fa, #f0f2f5);
+    transition: background 0.3s;
+}
+h2, h3, h4 { color: #212529; }
+
+/* ================= Sidebar ================= */
+.sidebar {
+    position: fixed;
+    left: 0; top: 0;
+    height: 100%;
+    width: 250px;
+    background: #1e293b;
+    padding-top: 20px;
+    transition: 0.3s;
+}
+.sidebar.collapsed { width: 70px; }
+.sidebar h4 {
+    color: #f8fafc;
+    text-align: center;
+    margin-bottom: 30px;
+    transition: 0.3s;
+    white-space: nowrap; overflow: hidden;
+}
+.sidebar.collapsed h4 { opacity: 0; }
+.sidebar a {
+    display: flex; align-items: center;
+    color: #cbd5e1; padding: 12px 20px;
+    text-decoration: none; transition: 0.3s;
+    white-space: nowrap; overflow: hidden;
+    border-radius: 8px;
+    margin: 4px 10px;
+}
+.sidebar.collapsed a { justify-content: center; padding: 12px 0; }
+.sidebar a:hover {
+    background: #334155;
+    color: #fff;
+    transform: translateX(3px);
+}
+.toggle-btn {
+    position: absolute; top: 20px; right: -25px;
+    width: 50px; height: 50px;
+    background: #4F46E5;
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: 0.3s;
+}
+.toggle-btn:hover { background: #06B6D4; transform: scale(1.1); }
+
+/* ================= Main Content ================= */
+.main {
+    margin-left: 250px;
+    padding: 30px;
+    transition: 0.3s;
+}
+.main.collapsed { margin-left: 70px; }
+
+/* ================= Cards ================= */
+.card {
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    padding: 25px;
+    margin-bottom: 25px;
+    background: #ffffffcc;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+}
+
+/* ================= Tables ================= */
+.table th, .table td {
+    vertical-align: middle;
+}
+.table-hover tbody tr:hover {
+    background: #e2e8f0;
+    transition: 0.3s;
+}
+.btn { border-radius: 8px; transition: 0.3s; }
+.btn:hover { transform: scale(1.05); }
+
+/* ================= Sections ================= */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ================= Responsive ================= */
+@media(max-width:768px){
+    .sidebar { width: 70px; }
+    .main { margin-left: 80px; padding: 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h4>Admin Panel</h4>
+    <div class="toggle-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></div>
+    <a href="#" onclick="showSection('home')"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+    <a href="#" onclick="showSection('add_user')"><i class="bi bi-person-plus me-2"></i> Add Student</a>
+    <a href="#" onclick="showSection('add_faculty')"><i class="bi bi-person-workspace me-2"></i> Add Faculty</a>
+    <a href="#" onclick="showSection('subject')"><i class="bi bi-book me-2"></i> Subjects</a>
+    <a href="#" onclick="showSection('faculty')"><i class="bi bi-person-badge me-2"></i> Faculty List</a>
+    <a href="#" onclick="showSection('students')"><i class="bi bi-mortarboard me-2"></i> Student List</a>
+    <a href="/admin/analytics"><i class="bi bi-bar-chart-line me-2"></i> Analytics</a>
+    <a href="/defaulter"><i class="bi bi-exclamation-triangle me-2"></i> Defaulters</a>
+    <a href="/logout" class="text-danger"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+</div>
+
+<!-- Main Content -->
+<div class="main" id="main">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <!-- Dashboard Section -->
+    <div id="home" class="section active">
+        <div class="card text-center">
+            <h3>📊 System Overview</h3>
+            <p><strong>Faculty:</strong> {{ faculty|length }}</p>
+            <p><strong>Students:</strong> {{ students|length }}</p>
+            <p><strong>Subjects:</strong> {{ subjects|length }}</p>
+        </div>
+    </div>
+
+    <!-- Add Student Section -->
+    <div id="add_user" class="section">
+        <div class="card">
+            <h4>🎓 Add Student</h4>
+            <form action="{{ url_for('add_user') }}" method="POST">
+                <input name="name" class="form-control mb-2" placeholder="Name" required>
+                <input name="password" class="form-control mb-2" placeholder="Password" required>
+                <select name="year" class="form-control mb-2" required>
+                    <option>1</option><option>2</option><option>3</option>
+                </select>
+                <select name="semester" class="form-control mb-2" required>
+                    <option>1</option><option>2</option><option>3</option>
+                    <option>4</option><option>5</option><option>6</option>
+                </select>
+                <select name="division" class="form-control mb-2" required>
+                    <option>A</option><option>B</option><option>C</option>
+                </select>
+                <button class="btn btn-primary w-20">Add Student</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Faculty Section -->
+    <div id="add_faculty" class="section">
+        <div class="card">
+            <h4>👨‍🏫 Add Faculty</h4>
+            <form action="/add_faculty" method="POST">
+                <input name="name" class="form-control mb-2" placeholder="Name" required>
+                <input name="password" class="form-control mb-2" placeholder="Password" required>
+                <label>Years (Ctrl/Cmd to select multiple)</label>
+                <select name="year" class="form-control mb-2" multiple required>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                </select>
+                <label>Semesters (Ctrl/Cmd to select multiple)</label>
+                <select name="semester" class="form-control mb-2" multiple required>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                    <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                </select>
+                <label>Divisions (Ctrl/Cmd to select multiple)</label>
+                <select name="division" class="form-control mb-2" multiple required>
+                    <option>A</option><option>B</option><option>C</option>
+                </select>
+                <button class="btn btn-primary w-20">Add Faculty</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Subject Section -->
+    <div id="subject" class="section">
+        <div class="card">
+            <h4>📚 Add Subject</h4>
+            <form action="/add_subject" method="POST">
+                <input name="subject" class="form-control mb-2" placeholder="Subject Name" required>
+                <select name="year" class="form-control mb-2" required>
+                    <option>1</option><option>2</option><option>3</option>
+                </select>
+                <select name="semester" class="form-control mb-2" required>
+                    <option>1</option><option>2</option><option>3</option>
+                    <option>4</option><option>5</option><option>6</option>
+                </select>
+                <select name="division" class="form-control mb-2" required>
+                    <option>A</option><option>B</option><option>C</option>
+                </select>
+                <select name="faculty_id" class="form-control mb-2" required>
+                    {% for f in faculty %}
+                    <option value="{{ f.id }}">{{ f.username }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-primary w-20">Add Subject</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Faculty List Section -->
+    <div id="faculty" class="section">
+        <div class="card">
+            <h4>👩‍🏫 Faculty List</h4>
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Year(s)</th>
+                        <th>Semester(s)</th>
+                        <th>Division(s)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in faculty %}
+                        {% set years = [] %} {% set semesters = [] %} {% set divisions = [] %}
+                        {% for c in f.classes %}
+                            {% if c.year not in years %} {% set _ = years.append(c.year) %} {% endif %}
+                            {% if c.semester not in semesters %} {% set _ = semesters.append(c.semester) %} {% endif %}
+                            {% if c.division not in divisions %} {% set _ = divisions.append(c.division) %} {% endif %}
+                        {% endfor %}
+                    <tr>
+                        <td>{{ f.username }}</td>
+                        <td>{{ years | join(", ") }}</td>
+                        <td>{{ semesters | join(", ") }}</td>
+                        <td>{{ divisions | join(", ") }}</td>
+                        <td>
+    <a href="{{ url_for('edit_user', id=f.id) }}"
+       class="btn btn-warning btn-sm">
+       <i class="bi bi-pencil-square"></i> Edit
+    </a>
+
+    <a href="{{ url_for('delete_user', id=f.id) }}"
+       class="btn btn-danger btn-sm">
+       <i class="bi bi-trash-fill"></i> Remove
+    </a>
+</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Student List Section -->
+    <div id="students" class="section">
+        <div class="card">
+            <h4>📋 Student List</h4>
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Year</th>
+                        <th>Semester</th>
+                        <th>Division</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td>{{ s.username }}</td>
+                        <td>{{ s.year }}</td>
+                        <td>{{ s.semester }}</td>
+                        <td>{{ s.division }}</td>
+                        <td>
+    <a href="{{ url_for('edit_user', id=s.id) }}"
+       class="btn btn-warning btn-sm">
+       <i class="bi bi-pencil-square"></i> Edit
+    </a>
+
+    <a href="{{ url_for('delete_user', id=s.id) }}"
+       class="btn btn-danger btn-sm"
+       onclick="return confirm('Are you sure you want to delete this student?')">
+       <i class="bi bi-trash-fill"></i> Remove
+    </a>
+</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function showSection(id){
+    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("collapsed");
+    document.getElementById("main").classList.toggle("collapsed");
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

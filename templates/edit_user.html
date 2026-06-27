@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit User</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <div class="card p-4">
+
+        <h3>Edit {{ user.role.title() }}</h3>
+
+        <form method="POST">
+
+            <div class="mb-3">
+                <label>Name</label>
+
+                <input type="text"
+                       name="name"
+                       class="form-control"
+                       value="{{ user.username }}"
+                       required>
+            </div>
+
+            <div class="mb-3">
+                <label>New Password (leave blank if unchanged)</label>
+
+                <input type="password"
+                       name="password"
+                       class="form-control">
+            </div>
+
+            {% if user.role == 'student' %}
+
+            <div class="mb-3">
+                <label>Year</label>
+
+                <select name="year" class="form-control">
+
+                    <option value="1"
+                        {% if user.year==1 %}selected{% endif %}>1</option>
+
+                    <option value="2"
+                        {% if user.year==2 %}selected{% endif %}>2</option>
+
+                    <option value="3"
+                        {% if user.year==3 %}selected{% endif %}>3</option>
+
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Semester</label>
+
+                <select name="semester" class="form-control">
+
+                    {% for i in range(1,7) %}
+
+                    <option value="{{ i }}"
+                        {% if user.semester==i %}selected{% endif %}>
+                        {{ i }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Division</label>
+
+                <select name="division" class="form-control">
+
+                    <option value="A"
+                        {% if user.division=='A' %}selected{% endif %}>
+                        A
+                    </option>
+
+                    <option value="B"
+                        {% if user.division=='B' %}selected{% endif %}>
+                        B
+                    </option>
+
+                    <option value="C"
+                        {% if user.division=='C' %}selected{% endif %}>
+                        C
+                    </option>
+
+                </select>
+            </div>
+
+            {% endif %}
+
+            <button class="btn btn-primary">
+                Update
+            </button>
+
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="btn btn-secondary">
+               Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Defaulters List</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { font-family: Poppins, sans-serif; background: #f0f2f5; }
+
+.card {
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container mt-4">
+
+<!-- HEADER -->
+<div class="header mb-4">
+    <h2>Defaulters List (Semester-wise)</h2>
+
+    <!-- 🔥 GLOBAL EXPORT (ALL SEM OPTIONAL) -->
+</div>
+
+<!-- SEMESTER CARDS -->
+{% for sem, students in defaulters_semwise.items() %}
+    <div class="card">
+
+        <!-- 🔥 CARD HEADER WITH BUTTON -->
+        <div class="d-flex justify-content-between align-items-center">
+            <h4>Semester {{ sem }}</h4>
+
+            <a href="{{ url_for('export_defaulters_pdf', sem=sem) }}"
+               class="btn btn-danger btn-sm">
+               📄 Export PDF
+            </a>
+        </div>
+
+        {% if students %}
+        <table class="table table-bordered mt-3">
+            <thead class="table-danger">
+                <tr>
+                    <th>Name</th>
+                    <th>Subject</th>
+                    <th>Attendance %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.subject }}</td>
+                    <td>{{ s.percentage }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="text-success mt-2">No defaulters in this semester!</p>
+        {% endif %}
+
+    </div>
+{% endfor %}
+
+<a href="/admin/dashboard" class="btn btn-secondary">⬅ Back</a>
+
+</div>
+
+</body>
+</html>
